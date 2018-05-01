@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">MobileDevelopmentCourseKPI</string>
+    <string name="app_name">Розробка мобільних застосувань</string>
+    <string name="title_activity_currency_list">CurrencyListActivity</string>
+    <string name="list_title">Валюти</string>
+    <string name="title_cc">Скорочення</string>
+    <string name="title_rate">Курс</string>
+    <string name="title_full_name">Повна назва</string>
+    <string name="title_r030">Код</string>
+    <string name="title_date">Дата</string>
 </resources>
