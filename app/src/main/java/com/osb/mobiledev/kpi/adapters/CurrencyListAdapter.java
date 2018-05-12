@@ -60,7 +60,7 @@ public class CurrencyListAdapter extends ArrayAdapter<Currency> {
         NumberFormat decimalFormat = new DecimalFormat("#0.00000");
         rateView.setText(decimalFormat.format(currency.getRate()));
         fullTitleView.setText(currency.getTxt());
-        codeView.setText(currency.getR030());
+        codeView.setText(currency.getR030().toString());
         dateView.setText(currency.getExchangeDate());
 
         return convertView;

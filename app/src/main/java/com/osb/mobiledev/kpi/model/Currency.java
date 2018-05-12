@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class Currency {
-    String r030;
+    Long r030;
     String txt;
     Double rate;
     String cc;

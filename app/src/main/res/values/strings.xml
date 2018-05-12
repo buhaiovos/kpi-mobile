@@ -7,4 +7,9 @@
     <string name="title_full_name">Повна назва</string>
     <string name="title_r030">Код</string>
     <string name="title_date">Дата</string>
+    <string name="currency">Валюта</string>
+    <string name="rate">Курс</string>
+    <string name="title_exchange_search">Шукати обмін валют неподалік</string>
+    <string name="title_save">Додати в історію</string>
+    <string name="title_show_history">Показати історію</string>
 </resources>

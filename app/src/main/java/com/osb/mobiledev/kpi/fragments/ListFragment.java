@@ -1,6 +1,9 @@
-package com.osb.mobiledev.kpi;
+package com.osb.mobiledev.kpi.fragments;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.arch.persistence.room.Room;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,8 +14,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.osb.mobiledev.kpi.R;
 import com.osb.mobiledev.kpi.adapters.CurrencyListAdapter;
+import com.osb.mobiledev.kpi.database.AppDatabase;
 import com.osb.mobiledev.kpi.model.Currency;
+import com.osb.mobiledev.kpi.model.CurrencyDTO;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -30,26 +36,52 @@ import static java.util.Collections.singletonList;
 
 public class ListFragment extends Fragment {
     private static final String TAG = ListFragment.class.getName();
+
+    private AppDatabase database;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         val view = createAndConfigureView(inflater, container, savedInstanceState);
+
         return view;
     }
 
     private View createAndConfigureView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.currency_list_fragment, container, false);
 
-        //init list view
+        // init list view
         ListView listView = (ListView) getView(view, R.id.listView_currencies);
+
+        // set item click listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(TAG, "onItemClick handled successfully");
+                Log.d(TAG, "Passing data to Details fragment");
+                Fragment detailsFragment = new CurrencyDetailFragment();
+                detailsFragment.setArguments(
+                        getBundleForDetails((Currency) parent.getItemAtPosition(position))
+                );
+                FragmentManager fragmentManager = getActivity().getFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.replace(R.id.fragment_container, detailsFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+
+            private Bundle getBundleForDetails(Currency currency) {
+                Bundle currencyBundle = new Bundle();
+                currencyBundle.putSerializable(
+                        "currency",
+                        new CurrencyDTO(currency.getTxt(), currency.getRate(), currency.getExchangeDate(), currency.getR030())
+                );
+                Log.d(TAG, currencyBundle.toString());
+                return currencyBundle;
             }
         });
-
-        new FetchDataTask(listView).execute();
+        if (getActivity() != null) {
+            new FetchDataTask(listView).execute();
+        }
 
         return view;
     }
@@ -73,22 +105,20 @@ public class ListFragment extends Fragment {
 
         @Override
         protected List<Currency> doInBackground(Void... voids) {
-            Log.d(TAG, "doing backgroudn stuff");
+            Log.d(TAG, "Fetching currency API...");
             HttpHeaders headers = new HttpHeaders();
             headers.setAccept(singletonList(MediaType.APPLICATION_JSON));
             HttpEntity requestEntity = new HttpEntity(headers);
 
             ResponseEntity<List<Currency>> currencyResponse = new RestTemplate().exchange(
                     API_URL, HttpMethod.GET, requestEntity,
-                    new ParameterizedTypeReference<List<Currency>>(){}
+                    new ParameterizedTypeReference<List<Currency>>() {
+                    }
             );
 
-            Log.d(TAG, "Fetched api data.");
-            List<Currency> result = currencyResponse.getBody();
-            for (Currency c : result) {
-                Log.d(TAG, "Fetched: " + c.toString());
-            }
-            return result;
+            List<Currency> results = currencyResponse.getBody();
+            Log.d(TAG, "Fetched api data: " + results.size() + " results");
+            return results;
         }
 
         @Override
